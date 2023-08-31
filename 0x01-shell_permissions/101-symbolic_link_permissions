@@ -1,2 +1,2 @@
 #!/bin/bash
-chown --dereference vincent:group _hello
+chown vincent:group _hello

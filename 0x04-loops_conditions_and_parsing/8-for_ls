@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Displays the content of the current directory in a list format, where only the part of the name after the first dash is displayed.
+
+files=(*[!.]**)
+
+for file in "${files[@]}"
+do
+	name_after_dash=${file#*-}
+
+	echo "$name_after_dash"
+done

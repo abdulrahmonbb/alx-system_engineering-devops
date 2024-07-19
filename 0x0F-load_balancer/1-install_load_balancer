@@ -1,10 +1,24 @@
 #!/usr/bin/env bash
 # This script installs and configures HAproxy on the server
-
-CONFIG="frontend http_front\n\tbind *:80\n\tdefault_backend http_back\n\nbackend http_back \
-\n\tbalance roundrobin\n\tserver web-01 100.25.171.73:80 check\n\tserver web-02 54.210.174.198:80 check"
+# - Enables management via the init script
+# - Distributes requests using a roundrobin algorithm
 
 sudo apt-get update
 sudo apt install -y haproxy
-sudo sed -i "19i $CONFIG" /etc/haproxy/haproxy.cfg
+echo "ENABLED=1" | sudo tee -a /etc/default/haproxy
+
+cat <<EOT | sudo tee -a /etc/haproxy/haproxy.cfg
+frontend abdulrahmonbb.tech
+    timeout client 30000
+    bind 0:80
+    default_backend abdulrahmonbb.tech_backend
+
+backend abdulrahmonbb.tech_backend
+    timeout connect 3000
+    timeout server 30000
+    balance roundrobin
+    server 439551-web-01 100.25.171.73:80 check
+    server 439551-web-02 54.210.174.198:80 check
+EOT
+
 sudo service haproxy restart

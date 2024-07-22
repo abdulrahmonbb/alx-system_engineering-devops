@@ -1,51 +1,29 @@
 #!/usr/bin/env bash
 # This script displays information about subdomains
 
-# Check if domain argument is provided
-if [ -z "$1" ]
-then
-    echo "Usage: $0 <domain> [subdomain]"
-    exit 1
-fi
+# Define Variables
+domain=$1
+subdomain=$2
 
-# Assign arguments to variables
-domain="$1"
-subdomain="$2"
+# List of subdomains
+sd_list=("www" "lb-01" "web-01" "web-02")
 
-# Define a list of default subdomains to check
-default_subdomains=("www" "lb-01" "web-01" "web-02")
-
-# Function to retrieve and display DNS record information
-function audit_subdomain {
-    local subdomain="$1"
-
-    # Get the DNS record typr and destination using dig
-    record_info=$(dig +short "$subdomain.$domain" | awk '{print $1}')
-
-    if [ -z "$record_info" ]
-    then
-        echo "No record found for "$subdomain.$domain""
-    else
-        # Determine the type of record (A or CNAME)
-        record_type=$(dig +short -t A "$subdomain.$domain" | awk '{print "A"}')
-        if [ -z "$record_type" ]
-        then
-            record_type=$(dig +short -t CNAME "$subdomain.$domain" | awk '{print "CNAME"}')
-        fi
-        # Output the result
-        echo "The subdomain [$subdomain] is a [$record_type] record and points to [$record_info]"
-    fi
+# Define Function
+dig_cmd() {
+    subdomain=$2
+    CMD=$(dig "$subdomain.$domain" | grep -A1 'ANSWER SECTION:' | awk 'NR==2')
+    IP=$(echo "$CMD" | awk '{print $5}')
+    RECORD=$(echo "$CMD" | awk '{print $4}')
+    echo "The subdomain $subdomain is a $RECORD record and points to $IP"
 }
 
-# If a specific subdomain is provided, audit that subdomain
-if [ -n "$subdomain" ]
+if [ "$#" -eq 1 ]
 then
-    audit_subdomain "$subdomain"
-else
-    # If no specific subdomain is provided, audit the default subdomains
-    for sub in "${default_subdomains[@]}"
+    for sub in "${sd_list[@]}"
     do
-        audit_subdomain "$sub"
+        dig_cmd "$domain" "$sub"
     done
+elif [ "$#" -eq 2 ]
+then
+    dig_cmd "$domain" "$subdomain"
 fi
-        

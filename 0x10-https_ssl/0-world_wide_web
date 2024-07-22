@@ -22,7 +22,7 @@ function audit_subdomain {
     # Get the DNS record typr and destination using dig
     record_info=$(dig +short "$subdomain.$domain" | awk '{print $1}')
 
-    if [ -z "record_info" ]
+    if [ -z "$record_info" ]
     then
         echo "No record found for "$subdomain.$domain""
     else

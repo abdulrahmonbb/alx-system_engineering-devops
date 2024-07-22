@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# This script displays information about subdomains
+
+# Check if domain argument is provided
+if [ -z "$1" ]
+then
+    echo "Usage: $0 <domain> [subdomain]"
+    exit 1
+fi
+
+# Assign arguments to variables
+domain="$1"
+subdomain="$2"
+
+# Define a list of default subdomains to check
+default_subdomains=("www" "lb-01" "web-01" "web-02")
+
+# Function to retrieve and display DNS record information
+function audit_subdomain {
+    local subdomain="$1"
+
+    # Get the DNS record typr and destination using dig
+    record_info=$(dig +short "$subdomain.$domain" | awk '{print $1}')
+
+    if [ -z "record_info" ]
+    then
+        echo "No record found for "$subdomain.$domain""
+    else
+        # Determine the type of record (A or CNAME)
+        record_type=$(dig +short -t A "$subdomain.$domain" | awk '{print "A"}')
+        if [ -z "$record_type" ]
+        then
+            record_type=$(dig +short -t CNAME "$subdomain.$domain" | awk '{print "CNAME"}')
+        fi
+        # Output the result
+        echo "The subdomain [$subdomain] is a [$record_type] record and points to [$record_info]"
+    fi
+}
+
+# If a specific subdomain is provided, audit that subdomain
+if [ -n "$subdomain" ]
+then
+    audit_subdomain "$subdomain"
+else
+    # If no specific subdomain is provided, audit the default subdomains
+    for sub in "${default_subdomains[@]}"
+    do
+        audit_subdomain "$sub"
+    done
+fi
+        

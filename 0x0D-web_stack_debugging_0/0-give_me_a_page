@@ -4,5 +4,5 @@
 apt-get update
 apt-get install -y apache2
 systemctl apache2 start
-echo "<html><body><h1>Holberton School</h1></body></html>" > /var/www/html/index.html
+echo "Holberton School" > /var/www/html/index.html
 systemctl apache2 restart

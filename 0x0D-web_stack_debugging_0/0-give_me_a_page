@@ -3,4 +3,4 @@
 
 echo "Holberton School" > /var/www/html/index.html
 systemctl apache2 status
-systemctl apache2 restart
+systemctl apache2 start

@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
-# This script installs apache on a docker container and returns a page
+# This script installs apache on a docker container and returns a page on request.
 
-docker exec -it b72a2d2da5b2 /bin/bash
-apt-get update
-apt-get install -y apache2
-service apache start
-echo "<html><body><h1>Hello Holberton</h1></body></html>" > /var/www/html/index.html
-exit
+echo "Holberton School" > /var/www/html/index.html
+sudo service apache2 start
+service apache2 restart
